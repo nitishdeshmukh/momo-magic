@@ -33,7 +33,12 @@ const adminLogin = async (req, res) => {
     return res.json({
       success: true,
       token,
-      user: { id: admin.id, role: admin.role, display: admin.name },
+      user: {
+        id: admin.id,
+        role: admin.role,
+        display: admin.name,
+        phoneNumber: admin.phoneNumber,
+      },
     });
   } catch (err) {
     console.error("adminLogin error:", err);
@@ -41,4 +46,36 @@ const adminLogin = async (req, res) => {
   }
 };
 
-export { adminLogin };
+const resetAdminPassword = async (req, res) => {
+  try {
+    const { phoneNumber, newPassword } = req.body;
+
+    if (!phoneNumber || !newPassword) {
+      return res.json({
+        success: false,
+        message: "Phone number and new password required",
+      });
+    }
+
+    // Find admin by phone number
+    const admin = await adminModel.findOne({ phoneNumber });
+    if (!admin) {
+      return res.json({ success: false, message: "Admin not found" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    admin.password = hashedPassword;
+    await admin.save();
+
+    return res.json({ success: true, message: "Password reset successfully" });
+  } catch (err) {
+    console.error("resetAdminPassword error:", err);
+    return res.json({ success: false, message: "Password reset failed" });
+  }
+};
+
+export { adminLogin, resetAdminPassword };

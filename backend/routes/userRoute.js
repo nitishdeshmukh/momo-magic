@@ -1,7 +1,10 @@
 // food-del/backend/routes/userRoute.js
 import express from "express";
 import { loginWithPhone, me } from "../controllers/userController.js";
-import { adminLogin } from "../controllers/adminController.js";
+import {
+  adminLogin,
+  resetAdminPassword,
+} from "../controllers/adminController.js";
 
 const router = express.Router();
 
@@ -10,6 +13,9 @@ router.post("/login", loginWithPhone);
 
 // Admin login for admin panel
 router.post("/admin-login", adminLogin);
+
+// Admin password reset
+router.post("/admin/reset-password", resetAdminPassword);
 
 // Example "me" route
 router.get("/me", me);

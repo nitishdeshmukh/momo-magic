@@ -6,14 +6,16 @@ const adminUsers = [
     id: "admin",
     name: "Admin",
     password: "Admin@6262111109",
-    role: "admin"
+    role: "admin",
+    phoneNumber: "+919893851208",
   },
   {
     id: "developer",
     name: "Developer",
     password: "Dev@7470669907",
-    role: "developer"
-  }
+    role: "developer",
+    phoneNumber: "+919893851201",
+  },
 ];
 
 const seedAdminUsers = async () => {
@@ -24,7 +26,7 @@ const seedAdminUsers = async () => {
         const hashedPassword = await bcrypt.hash(admin.password, 10);
         await adminModel.create({
           ...admin,
-          password: hashedPassword
+          password: hashedPassword,
         });
         console.log(`Seeded admin user: ${admin.name}`);
       } else {
