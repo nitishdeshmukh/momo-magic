@@ -23,7 +23,18 @@ export function AuthProvider({ children }) {
     try { localStorage.removeItem("mm_auth_user"); } catch {}
   };
 
-  const value = useMemo(() => ({ user, login, logout }), [user]);
+  // Get the JWT token for API calls
+  const getToken = () => {
+    try {
+      const raw = localStorage.getItem("mm_auth_user");
+      const userObj = raw ? JSON.parse(raw) : null;
+      return userObj?.token || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const value = useMemo(() => ({ user, login, logout, getToken }), [user]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

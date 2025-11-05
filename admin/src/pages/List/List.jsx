@@ -1,15 +1,14 @@
 // admin/src/pages/List/List.jsx
 import React, { useEffect, useState } from 'react'
 import './List.css'
-import { url } from '../../assets/assets'
-import axios from 'axios'
+import axiosInstance from '../../utils/axiosInstance'
 import { toast } from 'react-toastify'
 
 const List = () => {
   const [list, setList] = useState([])
 
   const fetchList = async () => {
-    const response = await axios.get(`${url}/api/food/list`)
+    const response = await axiosInstance.get(`/api/food/list`)
     if (response.data.success) {
       setList(response.data.data)
     } else {
@@ -18,9 +17,7 @@ const List = () => {
   }
 
   const removeItem = async (id) => {
-    const response = await axios.post(`${url}/api/food/remove`, { id }, {
-      headers: { "x-admin-key": ADMIN_KEY },
-    })
+    const response = await axiosInstance.post(`/api/food/remove`, { id })
     if (response.data.success) {
       toast.success(response.data.message)
       setList(prev => prev.filter(i => i._id !== id))

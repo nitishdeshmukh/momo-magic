@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./Analytics.css";
 import axios from "axios";
 import { url } from "../../assets/assets";
+import { useAuth } from "../../auth/AuthContext";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie
@@ -9,8 +10,6 @@ import {
 import DatePicker from "react-datepicker";
 import { format, parseISO } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
-const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY;
-const hdr = { headers: { "x-admin-key": ADMIN_KEY } };
 
 /* ---------- helpers ---------- */
 const months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
@@ -118,21 +117,29 @@ const useFetch = (fn, deps = []) => {
 };
 
 export default function Analytics() {
+  const { getToken } = useAuth();
+
   /* -------- KPI range -------- */
   const [kFrom, setKFrom] = useState(() => {
     const d = new Date(); d.setDate(d.getDate() - 28); return d.toISOString().slice(0, 10);
   });
   const [kTo, setKTo] = useState(todayISO());
   const kpiNew = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/new-customers${qs({ from: kFrom, to: kTo })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/new-customers${qs({ from: kFrom, to: kTo })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return r.data?.data || { series: [], summary: {} };
   }, [kFrom, kTo]);
   const kpiRepeat = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/repeat-rate${qs({ from: kFrom, to: kTo })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/repeat-rate${qs({ from: kFrom, to: kTo })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return r.data?.data || { totalUsers: 0, repeatUsers: 0, repeatRate: 0 };
   }, [kFrom, kTo]);
   const kpiRevenue = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/revenue-total${qs({ from: kFrom, to: kTo })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/revenue-total${qs({ from: kFrom, to: kTo })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return r.data?.data || { total: 0 };
   }, [kFrom, kTo]);
 
@@ -141,7 +148,9 @@ export default function Analytics() {
   const [ncMonth, setNcMonth] = useState(pad(now.getMonth() + 1));
   const [ncYear, setNcYear] = useState(String(now.getFullYear()));
   const nc = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/new-customers${qs({ month: `${ncYear}-${ncMonth}` })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/new-customers${qs({ month: `${ncYear}-${ncMonth}` })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return r.data?.data || { series: [], summary: {} };
   }, [ncMonth, ncYear]);
 
@@ -149,7 +158,9 @@ export default function Analytics() {
   const [revMonth, setRevMonth] = useState(pad(now.getMonth() + 1));
   const [revYear, setRevYear] = useState(String(now.getFullYear()));
   const rev = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/revenue-month${qs({ month: `${revYear}-${revMonth}` })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/revenue-month${qs({ month: `${revYear}-${revMonth}` })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return r.data?.data || { rows: [] };
   }, [revMonth, revYear]);
 
@@ -159,11 +170,15 @@ export default function Analytics() {
   const [leastMonth, setLeastMonth] = useState(pad(now.getMonth() + 1));
   const [leastYear, setLeastYear] = useState(String(now.getFullYear()));
   const top = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/top-dishes${qs({ month: `${topYear}-${topMonth}`, limit: 10 })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/top-dishes${qs({ month: `${topYear}-${topMonth}`, limit: 10 })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return Array.isArray(r.data?.data) ? r.data.data : [];
   }, [topMonth, topYear]);
   const least = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/least-dishes${qs({ month: `${leastYear}-${leastMonth}`, limit: 10 })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/least-dishes${qs({ month: `${leastYear}-${leastMonth}`, limit: 10 })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return Array.isArray(r.data?.data) ? r.data.data : [];
   }, [leastMonth, leastYear]);
 
@@ -171,11 +186,15 @@ export default function Analytics() {
   const [comboMonth, setComboMonth] = useState(pad(now.getMonth() + 1));
   const [comboYear, setComboYear] = useState(String(now.getFullYear()));
   const combos = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/popular-combos${qs({ month: `${comboYear}-${comboMonth}`, limit: 10 })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/popular-combos${qs({ month: `${comboYear}-${comboMonth}`, limit: 10 })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     return Array.isArray(r.data?.data) ? r.data.data : [];
   }, [comboMonth, comboYear]);
   const nameMap = useFetch(async () => {
-    const r = await axios.get(`${url}/api/analytics/dish-name-map${qs({ month: `${comboYear}-${comboMonth}` })}`, hdr);
+    const r = await axios.get(`${url}/api/analytics/dish-name-map${qs({ month: `${comboYear}-${comboMonth}` })}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
     const map = {}; (r.data?.data || []).forEach(x => { map[x.id] = x.name; });
     return map;
   }, [comboMonth, comboYear]);
@@ -191,7 +210,9 @@ export default function Analytics() {
   async function fetchOrdersForExport() {
     setOrdersLoading(true);
     try {
-      const r = await axios.get(`${url}/api/analytics/contacts${qs({ from: ecFrom, to: ecTo })}`, hdr);
+      const r = await axios.get(`${url}/api/analytics/contacts${qs({ from: ecFrom, to: ecTo })}`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
       setOrders(Array.isArray(r.data?.data) ? r.data.data : []);
     } finally {
       setOrdersLoading(false);

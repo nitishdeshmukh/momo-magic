@@ -1,10 +1,8 @@
 // admin/src/pages/Add/Add.jsx
 import React, { useState } from "react";
 import "./Add.css";
-import { url } from "../../assets/assets";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 import { toast } from "react-toastify";
-const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY;
 
 
 const CATEGORIES = [
@@ -53,12 +51,7 @@ const Add = () => {
         return;
       }
 
-      const response = await axios.post(`${url}/api/food/add`, payload, {
-        headers: {
-          "x-admin-key": ADMIN_KEY,
-          "Content-Type": "application/json"
-        }
-      });
+      const response = await axiosInstance.post(`/api/food/add`, payload);
 
       if (response.data?.success) {
         toast.success(response.data.message || "Item added");

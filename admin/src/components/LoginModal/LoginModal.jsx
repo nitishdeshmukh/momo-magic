@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./LoginModal.css";
-import { verifyCredentials } from "../../auth/auth";
+import { loginWithCredentials } from "../../auth/auth";
 import { useAuth } from "../../auth/AuthContext";
 
 export default function LoginModal({ open, onClose }) {
@@ -9,6 +9,7 @@ export default function LoginModal({ open, onClose }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [loading, setLoading] = useState(false);
   const idRef = useRef(null);
 
   useEffect(() => {
@@ -17,18 +18,29 @@ export default function LoginModal({ open, onClose }) {
       setId("");
       setPw("");
       setShowPw(false);
+      setLoading(false);
       setTimeout(() => idRef.current?.focus(), 50);
     }
   }, [open]);
 
-  const doLogin = () => {
-    const u = verifyCredentials(id.trim(), pw);
-    if (!u) {
-      setErr("Invalid ID or password");
+  const doLogin = async () => {
+    if (!id.trim() || !pw) {
+      setErr("Please enter both ID and password");
       return;
     }
-    login(u);
-    onClose?.();
+
+    setLoading(true);
+    setErr("");
+
+    try {
+      const result = await loginWithCredentials(id.trim(), pw);
+      login({ ...result.user, token: result.token });
+      onClose?.();
+    } catch (error) {
+      setErr(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onKeyDown = (e) => {

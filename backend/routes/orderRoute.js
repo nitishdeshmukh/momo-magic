@@ -1,7 +1,7 @@
 // backend/routes/orderRoute.js
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
-import adminOnly from "../middleware/admin.js";
+import { isAdminOrDeveloper } from "../middleware/role.js";
 import {
   listOrders,
   // placeOrder,
@@ -15,10 +15,10 @@ import {
 const orderRouter = express.Router();
 
 // Admin: list all orders
-orderRouter.get("/list", adminOnly, listOrders);
+orderRouter.get("/list", authMiddleware, isAdminOrDeveloper, listOrders);
 
 // Admin: get single order by id (for printing)
-orderRouter.get("/:id", adminOnly, getOrderById);
+orderRouter.get("/:id", authMiddleware, isAdminOrDeveloper, getOrderById);
 
 // User: list own orders
 orderRouter.post("/userorders", authMiddleware, userOrders);
@@ -27,7 +27,7 @@ orderRouter.post("/userorders", authMiddleware, userOrders);
 // orderRouter.post("/place", authMiddleware, placeOrder);
 
 // Update order status (admin panel)
-orderRouter.post("/status", adminOnly, updateStatus);
+orderRouter.post("/status", authMiddleware, isAdminOrDeveloper, updateStatus);
 
 // Stripe webhook-style verification endpoint used by frontend verify step
 orderRouter.post("/verify", verifyOrder);

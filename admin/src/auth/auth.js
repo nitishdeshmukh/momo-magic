@@ -1,23 +1,23 @@
-// Simple in-memory credentials. Change these before going live.
-export const USERS = {
-  admin: {
-    id: "admin",            // <<< change me
-    password: "Admin@6262111109",  // <<< change me
-    role: "admin",
-    display: "Admin",
-  },
-  developer: {
-    id: "developer",         // <<< change me
-    password: "Dev@7470669907",     // <<< change me
-    role: "developer",
-    display: "Developer",
-  },
-};
+// JWT-based authentication for admin panel
+import axios from "axios";
+import { url } from "../assets/assets";
 
-export function verifyCredentials(inputId, inputPassword) {
-  const u = Object.values(USERS).find(
-    user => String(user.id).toLowerCase() === String(inputId || "").toLowerCase()
-  );
-  if (!u) return null;
-  return u.password === inputPassword ? { id: u.id, role: u.role, display: u.display } : null;
+export async function loginWithCredentials(id, password) {
+  try {
+    const response = await axios.post(`${url}/api/user/admin-login`, {
+      id,
+      password
+    });
+
+    if (response.data?.success) {
+      return {
+        token: response.data.token,
+        user: response.data.user
+      };
+    } else {
+      throw new Error(response.data?.message || "Login failed");
+    }
+  } catch (error) {
+    throw new Error(error.response?.data?.message || error.message || "Login failed");
+  }
 }

@@ -2,13 +2,11 @@
 import React, { useEffect, useState, useEffect as UseEffect2 } from "react";
 import "./Orders.css";
 import "./InlinePrint.css";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 import { toast } from "react-toastify";
-import { url } from "../../assets/assets";
 import DatePicker from "react-datepicker";
 import { format, parseISO } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
-const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY;
 
 
 /* helpers */
@@ -183,9 +181,7 @@ const Orders = () => {
   async function fetchOrders() {
     try {
       setLoading(true);
-      const r = await axios.get(`${url}/api/order/list${qs({ from, to })}`, {
-        headers: { "x-admin-key": ADMIN_KEY },
-      });
+      const r = await axiosInstance.get(`/api/order/list${qs({ from, to })}`);
       setOrders(Array.isArray(r.data?.data) ? r.data.data : []);
     } catch {
       toast.error("Failed to load orders");
@@ -201,9 +197,7 @@ const Orders = () => {
   // status change
   const updateStatus = async (orderId, status) => {
     try {
-      const r = await axios.post(`${url}/api/order/status`, { orderId, status }, {
-        headers: { "x-admin-key": ADMIN_KEY },
-      });
+      const r = await axiosInstance.post(`/api/order/status`, { orderId, status });
       if (r.data?.success) {
         setOrders((prev) => prev.map((o) => (o._id === orderId ? { ...o, status } : o)));
       } else {

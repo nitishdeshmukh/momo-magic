@@ -1,12 +1,13 @@
 import express from "express";
 import { listFood, addFood, removeFood } from "../controllers/foodController.js";
-import adminOnly from "../middleware/admin.js";
+import authMiddleware from "../middleware/auth.js";
+import { isAdminOrDeveloper } from "../middleware/role.js";
 
 const foodRouter = express.Router();
 
 // No multer, no file upload. Pure JSON bodies.
 foodRouter.get("/list", listFood);
-foodRouter.post("/add", adminOnly, addFood);
-foodRouter.post("/remove", adminOnly, removeFood);
+foodRouter.post("/add", authMiddleware, isAdminOrDeveloper, addFood);
+foodRouter.post("/remove", authMiddleware, isAdminOrDeveloper, removeFood);
 
 export default foodRouter;
