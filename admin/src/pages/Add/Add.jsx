@@ -15,6 +15,7 @@ const CATEGORIES = [
   "Soup",
   "Pasta",
   "Moburg",
+  "Cigarette",
   "MMC Special Dishes",
   "Chinese Magic Noodles",
   "Chinese Magic Rice",
